@@ -25,11 +25,21 @@
 		.draggable-list {
 			float: left;
 		}
+		
+		.draggable-item-shaper {
+			border: 2px lightgray solid;
+			height: 30px;
+			width: 100px;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			user-select: none;
+			list-style-type: none;
+		}
 	</style>
 </head>
 <body>
 	<div class="draggable">
-		<ul class="draggable-list">
+		<ul class="draggable-list" name="list-one">
 			<li>1</li>
 			<li>2</li>
 			<li>3</li>
@@ -41,7 +51,7 @@
 			<div>44</div>
 		</div> -->
 
-		<ul class="draggable-list">
+		<ul class="draggable-list" name="list-two">
 			<li>6</li>
 			<li>7</li>
 			<li>8</li>
