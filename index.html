@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Drag&drop</title>
+	<style>
+		.draggable-item {
+			top: 0;
+			left: 0;
+			height: 30px;
+			width: 100px;
+			border: 1px black solid;
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			user-select: none;
+		}
+		.draggable-item:hover {
+			background: gray;
+			cursor: pointer;
+		}
+		.draggable-item.dragging {
+			position: absolute;
+			z-index: 1000;
+		}
+		.draggable-list {
+			float: left;
+		}
+	</style>
+</head>
+<body>
+	<div class="draggable">
+		<ul class="draggable-list">
+			<li>1</li>
+			<li>2</li>
+			<li>3</li>
+			<li>4</li>
+		</ul>
+<!-- 		<div class="draggable-list">
+			<div>22</div>
+			<div>33</div>
+			<div>44</div>
+		</div> -->
+
+		<ul class="draggable-list">
+			<li>6</li>
+			<li>7</li>
+			<li>8</li>
+			<li>9</li>
+		</ul>
+	</div>
+</body>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="main.js"></script>
+</html>
