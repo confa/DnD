@@ -64,9 +64,9 @@ $(document).ready(function() {
 						timerId = setTimeout(function() {
 							if($currentItem && $elem) {
 								$elem.text($elem.text() + ' ' + $currentItem.text());
+								$elem.trigger('OnСombined', [$elem.text()]);
 								$currentItem.detach();
 								$currentItem = null;
-								$elem.trigger('OnСombined', [$currentItem.text()]);
 							}
 						}, 2000);
 					}
@@ -129,5 +129,8 @@ $(document).ready(function() {
 	$('.draggable').makeDraggable();
 	$('.draggable').on('OnDropped', function(e, from, to, name) {
 		console.log('Element ' + name + ' has been dragged from ' + from + ' to ' + to);
+	});
+	$('.draggable').on('OnCombined', function(e, text) {
+		console.log('Elem' + text);
 	});
 });
