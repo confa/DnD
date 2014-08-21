@@ -12,8 +12,6 @@ $(document).ready(function() {
 			$item.toggleClass('draggable-item', true);
 			$item.mousedown(function (event) {
 				$currentItem = $(this);
-				$draggableStub.insertAfter($currentItem);
-				$currentItem.toggleClass('dragging', true);
 				_setRelativePosition(event);
 				if(event.shiftKey) {
 					console.log($currentItem.index() + ' ' + $prevItem.index());
@@ -23,13 +21,20 @@ $(document).ready(function() {
 							$(this).toggleClass('selected', true);
 						}	
 					});
+					$prevItem = $(this);
+					$currentItem = null;
 				} else if(event.ctrlKey) {
 					$currentItem.toggleClass('selected');
 					$prevItem = $(this);
+					$currentItem=null;
 				} else {
-					$('.draggable-item.selected:not(.dragging)').toggleClass('selected', false);
-					$currentItem.toggleClass('selected');
-					$prevItem = $(this);
+					$draggableStub.insertAfter($currentItem);
+					$currentItem.toggleClass('dragging', true);
+					if (!$currentItem.hasClass('selected'))
+					{
+						$('.draggable-item.selected:not(.dragging)').toggleClass('selected', false);
+					}
+					$currentItem.toggleClass('selected');				
 				}
 			});
 		});
@@ -50,19 +55,19 @@ $(document).ready(function() {
 						
 						var elemPos = $elem.offset();
 						clearTimeout(timer);
-						if((!$elem.hasClass('draggable-stub')) && (elemPos.top + 0.15*$currentItem.height() < childPos.top) && (elemPos.top + 0.85*$currentItem.height() > childPos.top)) {
-							timer = setTimeout(function() {
-								if($currentItem && $elem) {
-									$('.draggable').append('<ul class="draggable-list new-list"></ul>');
-									$currentItem.removeClass('dragging');
-									$('.new-list').append($elem);
-									$('.new-list').append($currentItem);
-									$currentItem = null;
-									$draggableStub.detach();
-									$('ul:last').removeClass('new-list');
-								}
-							}, 2000);
-						}
+						// if((!$elem.hasClass('draggable-stub')) && (elemPos.top + 0.15*$currentItem.height() < childPos.top) && (elemPos.top + 0.85*$currentItem.height() > childPos.top)) {
+							// timer = setTimeout(function() {
+								// if($currentItem && $elem) {
+									// $('.draggable').append('<ul class="draggable-list new-list"></ul>');
+									// $currentItem.removeClass('dragging');
+									// $('.new-list').append($elem);
+									// $('.new-list').append($currentItem);
+									// $currentItem = null;
+									// $draggableStub.detach();
+									// $('ul:last').removeClass('new-list');
+								// }
+							// }, 2000);
+						// }
 						
 						if(childPos && parentPos && childPos.top - parentPos.top < $currentItem.outerHeight() / 2) {
 							$draggableStub.insertBefore($elem);
@@ -76,14 +81,22 @@ $(document).ready(function() {
 
 		$(document).mouseup(function(event) {
 			if($currentItem) {
-				$currentItem.trigger('OnDropped', [$currentItem.parent().index(), $draggableStub.parent().index(), $currentItem.text()]);
-			
-				$currentItem.removeAttr('style');
-				$currentItem.detach();
-				$currentItem.insertAfter($draggableStub);
-				$currentItem.toggleClass('dragging', false);
+				if (!(event.shiftKey || event.ctrlKey)) {
+					$currentItem.trigger('OnDropped', [$currentItem.parent().index(), $draggableStub.parent().index(), $currentItem.text()]);
 				
-				$currentItem = null;
+					$currentItem.removeAttr('style');
+					//$currentItem.insertAfter($draggableStub);
+					$currentItem.toggleClass('dragging', false);
+					$currentItem.parent().children('.draggable-item.selected').each(function(){
+						$(this).toggleClass('selected', false);
+						$(this).insertAfter($draggableStub);
+					});
+					$currentItem.insertAfter($draggableStub);
+					
+					//$currentItem.detach();
+					
+					$currentItem = null;
+				}
 			}
 			$draggableStub.detach();
 		});
