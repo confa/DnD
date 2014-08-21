@@ -25,28 +25,48 @@
 		.draggable-list {
 			float: left;
 		}
+		.draggable-list-empty{
+			height: 30px;
+			width: 100px;
+			border: 1px solid black;
+		}
+		.selected {
+			background: red;
+		}
+		#container {
+			position: absolute;
+			z-index: 1000;
+			border: 1px black solid;
+		}
 	</style>
 </head>
 <body>
 	<div class="draggable">
-		<ul class="draggable-list">
+		<ul class="draggable-list" id="playlist1" name="first">
+			<!-- <li class="draggable-item draggable-stub-empty" style="display: none"></li> -->
 			<li>1</li>
 			<li>2</li>
 			<li>3</li>
 			<li>4</li>
 		</ul>
-<!-- 		<div class="draggable-list">
-			<div>22</div>
-			<div>33</div>
-			<div>44</div>
-		</div> -->
 
-		<ul class="draggable-list">
+		<ul class="draggable-list" id="playlist2" name="second">
+			<!-- <li class="draggable-item draggable-stub-empty" style="display: none"></li> -->
 			<li>6</li>
 			<li>7</li>
 			<li>8</li>
 			<li>9</li>
 		</ul>
+
+		<ul class="draggable-list" id="playlist3" name="third">
+			<!-- <li class="draggable-item draggable-stub-empty" style="display: none"></li> -->
+			<li>11</li>
+			<li>12</li>
+			<li>13</li>
+			<li>14</li>
+		</ul>
+
+		<div id="container" class="container"></div>
 	</div>
 </body>
 <script type="text/javascript" src="jquery.js"></script>
