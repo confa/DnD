@@ -6,8 +6,6 @@ $(document).ready(function() {
 		var $prevItem = null;
 		var $draggableStub = $('<li>').toggleClass('draggable-item', true).toggleClass('draggable-stub', true);
 		var timer = null;
-		var clickDelay = 600;
-		var lastClick, diffClick;
 
 		this.find('.draggable-list > li').each(function (index, item) {
 			var $item = $(item);
@@ -29,7 +27,7 @@ $(document).ready(function() {
 					$currentItem.toggleClass('selected');
 					$prevItem = $(this);
 				} else {
-					$('.draggable-item.selected').toggleClass('selected', false);
+					$('.draggable-item.selected:not(.dragging)').toggleClass('selected', false);
 					$currentItem.toggleClass('selected');
 					$prevItem = $(this);
 				}
