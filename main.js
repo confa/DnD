@@ -3,8 +3,11 @@ $(document).ready(function() {
 	$.fn.makeDraggable = function(options) {
 		var $rootElement = this;
 		var $currentItem = null;
+		var $prevItem = null;
 		var $draggableStub = $('<li>').toggleClass('draggable-item', true).toggleClass('draggable-stub', true);
 		var timer = null;
+		var clickDelay = 600;
+		var lastClick, diffClick;
 
 		this.find('.draggable-list > li').each(function (index, item) {
 			var $item = $(item);
@@ -14,6 +17,22 @@ $(document).ready(function() {
 				$draggableStub.insertAfter($currentItem);
 				$currentItem.toggleClass('dragging', true);
 				_setRelativePosition(event);
+				if(event.shiftKey) {
+					console.log($currentItem.index() + ' ' + $prevItem.index());
+					$currentItem.parent().children('.draggable-item').each(function() {
+						if (($currentItem.index() > $prevItem.index() && $(this).index() <= $currentItem.index() && $(this).index() > $prevItem.index()) || ($currentItem.index() < $prevItem.index() && $(this).index() >= $currentItem.index() && $(this).index() < $prevItem.index())) {
+							
+							$(this).toggleClass('selected', true);
+						}	
+					});
+				} else if(event.ctrlKey) {
+					$currentItem.toggleClass('selected');
+					$prevItem = $(this);
+				} else {
+					$('.draggable-item.selected').toggleClass('selected', false);
+					$currentItem.toggleClass('selected');
+					$prevItem = $(this);
+				}
 			});
 		});
 
@@ -57,7 +76,7 @@ $(document).ready(function() {
 			}
 		});
 
-		$(document).mouseup(function() {
+		$(document).mouseup(function(event) {
 			if($currentItem) {
 				$currentItem.trigger('OnDropped', [$currentItem.parent().index(), $draggableStub.parent().index(), $currentItem.text()]);
 			
@@ -72,13 +91,15 @@ $(document).ready(function() {
 		});
 
 		function _setRelativePosition(event) {
-			var parentOffset = $rootElement.offset();
-			var relX = event.pageX - parentOffset.left;
-			var relY = event.pageY - parentOffset.top;
-			$currentItem.css({
-				'top': relY + 'px',
-				'left': relX + 'px'
-			});
+			//$('.draggable-item.selected.dragging').each(function() {
+				var parentOffset = $rootElement.offset();
+				var relX = event.pageX - parentOffset.left;
+				var relY = event.pageY - parentOffset.top;
+				$currentItem.css({
+					'top': relY + 'px',
+					'left': relX + 'px'
+				});
+			//});
 		}
 
 		function _getCurrentTarget(event) {
