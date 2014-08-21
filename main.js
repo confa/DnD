@@ -66,6 +66,7 @@ $(document).ready(function() {
 								$elem.text($elem.text() + ' ' + $currentItem.text());
 								$currentItem.detach();
 								$currentItem = null;
+								$elem.trigger('OnСombined', [$currentItem.text()]);
 							}
 						}, 2000);
 					}
