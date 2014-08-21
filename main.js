@@ -12,17 +12,48 @@ $(document).ready(function() {
 			$item.toggleClass('draggable-item', true);
 			$item.mousedown(function (event) {
 				$currentItem = $(this);
+				if(event.ctrlKey) {
+					$currentItem.toggleClass('draggable-item-selected', true);
+				}
+				else if(event.shiftKey) {
+					var $lastSelectedItem = $currentItem.parent().children(".draggable-item-selected").last();
+					var allItems = $currentItem.parent().children();
+					var flag = false;
+					for(var i = 0; i < allItems.length; i++) {
+						if(allItems[i] === $lastSelectedItem[0]) {
+							flag = true;
+						}
+						if(allItems[i] == $currentItem.context) {
+							break;
+						}
+						if(flag == true) {
+							var $item = $(allItems[i]);
+							$item.toggleClass('draggable-item-selected', true);
+						}
+					}
+					$currentItem.toggleClass('draggable-item-selected', true);
+				}
+				else {
+					$currentItem.toggleClass('dragging', true);
+					$draggableStub.insertAfter($currentItem);
+				}
 				if($currentItem.parent().children().length == 1) {
 					$lastElement.insertAfter($currentItem);
 				}
-				$draggableStub.insertAfter($currentItem);
-				$currentItem.toggleClass('dragging', true);
+				
 				_setRelativePosition(event);
 			});
+			
 		});
 
 		this.mousemove(function (event) {
 			if($currentItem) {
+				var s = $currentItem.parent().children('.draggable-item-selected');
+				if(s.length > 0)
+				for(var i = 0; i < s.length; i++) {
+					$currentItem = s;
+					_setRelativePosition(event);
+				}
 				_setRelativePosition(event);
 				var $elem = _getCurrentTarget(event);
 				if($elem) {
@@ -48,19 +79,25 @@ $(document).ready(function() {
 			}
 		});
 
-		$(document).mouseup(function() {
+		$(document).mouseup(function(event) {
 			if($currentItem) {
-				if($draggableStub.parent().children().length == 2) {
-					$lastElement.detach();
+				if(event.ctrlKey || event.shiftKey) {
+					$currentItem.removeAttr('style');
+					$currentItem = null;
 				}
-				$currentItem.trigger('OnDropped', [$currentItem.parent().attr('name'), $draggableStub.parent().attr('name'), $currentItem.text()]);
-				$currentItem.removeAttr('style');
-				$currentItem.detach();
-				$currentItem.insertAfter($draggableStub);
-				$currentItem.toggleClass('dragging', false);
-				$currentItem = null;
-				
-				
+				else {
+					if($draggableStub.parent().children().length == 2) {
+						$lastElement.detach();
+					}
+					var selectedItems = $currentItem.parent().children('.draggable-item-selected').toggleClass('draggable-item-selected', false);;
+					
+					$currentItem.trigger('OnDropped', [$currentItem.parent().attr('name'), $draggableStub.parent().attr('name'), $currentItem.text()]);
+					$currentItem.removeAttr('style');
+					$currentItem.detach();
+					$currentItem.insertAfter($draggableStub);
+					$currentItem.toggleClass('dragging', false);
+					$currentItem = null;
+				}
 			}
 			$draggableStub.detach();
 		});
