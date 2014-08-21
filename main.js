@@ -16,7 +16,22 @@ $(document).ready(function() {
 					$currentItem.toggleClass('draggable-item-selected', true);
 				}
 				else if(event.shiftKey) {
-					console.log("shift");
+					var $lastSelectedItem = $currentItem.parent().children(".draggable-item-selected").last();
+					var allItems = $currentItem.parent().children();
+					var flag = false;
+					for(var i = 0; i < allItems.length; i++) {
+						if(allItems[i] === $lastSelectedItem[0]) {
+							flag = true;
+						}
+						if(allItems[i] == $currentItem.context) {
+							break;
+						}
+						if(flag == true) {
+							var $item = $(allItems[i]);
+							$item.toggleClass('draggable-item-selected', true);
+						}
+					}
+					$currentItem.toggleClass('draggable-item-selected', true);
 				}
 				else {
 					$currentItem.toggleClass('dragging', true);
@@ -66,7 +81,7 @@ $(document).ready(function() {
 
 		$(document).mouseup(function(event) {
 			if($currentItem) {
-				if(event.ctrlKey) {
+				if(event.ctrlKey || event.shiftKey) {
 					$currentItem.removeAttr('style');
 					$currentItem = null;
 				}
