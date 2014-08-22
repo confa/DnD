@@ -9,7 +9,7 @@ $(document).ready(function() {
 		var $container = $('#container');
 		var $parentId = "";
 		var $movingInfo = {"data" : []};
-		//var $movingInfo = {};
+		var $timerId = null;
 
 		this.find('.draggable-list > li').each(function (index, item) {
 			var $item = $(item);
@@ -59,6 +59,11 @@ $(document).ready(function() {
 				if($elem) {
 					var childPos = $currentItem.offset();
 					var parentPos = $draggableStub.parent().offset();
+
+					if($elem && $mousedown) {
+						$elem.trigger('MergeItems', [$elem, $currentItem]);
+
+
 					if (!$elem.hasClass('draggable-stub-empty')) {
 						if(childPos && parentPos && childPos.top - parentPos.top < $currentItem.outerHeight() / 2) {
 							$draggableStub.insertBefore($elem);
@@ -68,7 +73,8 @@ $(document).ready(function() {
 					}
 				}
 				};
-		});
+		}
+	});
 
 		$(document).mouseup(function() {
 			$mousedown = false;
@@ -145,6 +151,28 @@ $(document).ready(function() {
 			};
 			return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
 		}
+
+$('.draggable').on('MergeItems', function (e, mergeTo, mergeElem){
+		clearTimeout($timerId);
+						if(!mergeTo.hasClass('draggable-stub')) {
+							$timerId = setTimeout(function() {
+									if(mergeElem && mergeTo ) {
+										if ($currentItem.hasClass('container')) {
+											for(i = 0; i < $currentItem.children().length; i++)
+												mergeTo.text(mergeTo.html() + ' ' + $($currentItem.children()[i]).html());
+										}
+										else{
+											mergeTo.text(mergeTo.html() + ' ' + mergeElem.html());
+										}
+										$currentItem.detach();
+											$currentItem = null;
+
+								}
+							}, 2000);
+						}
+	})
+
+
 	};
 
 	$('.draggable').makeDraggable();
