@@ -197,7 +197,9 @@ $(document).ready(function () {
 
         $('.draggable').on('MergeItems', function(e, mergeTo, mergeElem) {
             clearTimeout($timerId);
-            if (!mergeTo.hasClass('draggable-stub')) {
+			mergeToPos = mergeTo.offset();
+			mergeElemPos = mergeElem.offset();
+            if ((!mergeTo.hasClass('draggable-stub')) && (mergeToPos.top + 0.15*$currentItem.height() < mergeElemPos.top) && (mergeToPos.top + 0.85*$currentItem.height() > mergeElemPos.top)) {
                 $timerId = setTimeout(function() {
                     if (mergeElem && mergeTo) {
                         if ($currentItem.hasClass('container') && $('.draggable-item-selected').length > 0) {
