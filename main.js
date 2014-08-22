@@ -97,7 +97,7 @@ $(document).ready(function () {
                     var parentPos = $draggableStub.parent().offset();
 
                     if ($elem.length > 0 && $mousedown) {
-                        $elem.trigger('MergeItems', [$elem, $currentItem]);
+                        $elem.trigger('OnMerged', [$elem, $currentItem]);
                         if (!$elem.hasClass('draggable-stub-empty')) {
                             if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
                                 $draggableStub.insertBefore($elem);
@@ -185,7 +185,7 @@ $(document).ready(function () {
             return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
         }
 
-        $('.draggable').on('MergeItems', function(e, mergeTo, mergeElem) {
+        $('.draggable').on('OnMerged', function(e, mergeTo, mergeElem) {
             clearTimeout($timerId);
             if (!mergeTo.hasClass('draggable-stub')) {
                 $timerId = setTimeout(function() {
