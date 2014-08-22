@@ -168,8 +168,9 @@ $(document).ready(function () {
         });
 
         function _setRelativePosition(event) {
-            var relX = event.pageX - $elementOffset.x;
-            var relY = event.pageY - $elementOffset.y;
+        	var $parentOffet = $rootElement.offset();
+            var relX = event.pageX - $elementOffset.x - $parentOffet.left;
+            var relY = event.pageY - $elementOffset.y - $parentOffet.top
             $currentItem.css({
                 'top': relY + 'px',
                 'left': relX + 'px'
