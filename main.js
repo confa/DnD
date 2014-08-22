@@ -11,28 +11,35 @@ $(document).ready(function () {
         var $movingInfo = { "data": [] };
         var $timerId = null;
 
+        var $elementOffset = { x: 0, y: 0 };
+
         this.find('.draggable-list > li').each(function(index, item) {
             var $item = $(item);
             $item.toggleClass('draggable-item', true);
             $item.mousedown(function(event) {
                 $mousedown = true;
                 $currentItem = $(this);
+
+                var $pos = $currentItem.offset();
+                $elementOffset.x = event.pageX - $pos.left;
+                $elementOffset.y = event.pageY - $pos.top;
+
+
                 if (!$currentItem.hasClass('draggable-item-selected') && !event.shiftKey) {
-                	$movingInfo.data.push({ "name": $currentItem.parent().attr('name'), "item": $currentItem.html() });
+                    $movingInfo.data.push({ "name": $currentItem.parent().attr('name'), "item": $currentItem.html() });
                 };
 
                 if (event.ctrlKey) {
-                	if ($currentItem.hasClass('draggable-item-selected')) {
-						$currentItem.toggleClass('draggable-item-selected', false);
-						for(i = 0; i < $movingInfo.data.length; i++){
-							if ($movingInfo.data[i].name == $currentItem.parent().attr('name') && $movingInfo.data[i].item == $currentItem.html()){
-								$movingInfo.data.splice(i, 1);
-							}
-						}
-                	}
-                	else {
-                		$currentItem.toggleClass('draggable-item-selected', true);
-                	}
+                    if ($currentItem.hasClass('draggable-item-selected')) {
+                        $currentItem.toggleClass('draggable-item-selected', false);
+                        for (i = 0; i < $movingInfo.data.length; i++) {
+                            if ($movingInfo.data[i].name == $currentItem.parent().attr('name') && $movingInfo.data[i].item == $currentItem.html()) {
+                                $movingInfo.data.splice(i, 1);
+                            }
+                        }
+                    } else {
+                        $currentItem.toggleClass('draggable-item-selected', true);
+                    }
                 } else if (event.shiftKey) {
                     var $indexFirst = -1;
                     var $indexLast = -1;
@@ -77,9 +84,8 @@ $(document).ready(function () {
                     $currentItem.append($('.draggable-item-selected'));
                 };
                 $currentItem.toggleClass('dragging', true);
-                $currentItem.show();
 
-                if (!$currentItem.hasClass('container')) {
+                if (!$currentItem.hasClass('container')) { // for not creating $draggableStub in container
                     $draggableStub.insertAfter($currentItem.children().last());
                 };
                 $currentItem.toggleClass('dragging', true);
@@ -93,7 +99,7 @@ $(document).ready(function () {
                     if ($elem.length > 0 && $mousedown) {
                         $elem.trigger('MergeItems', [$elem, $currentItem]);
                         if (!$elem.hasClass('draggable-stub-empty')) {
-                            if (childPos && parentPos && childPos.top - parentPos.top < $currentItem.outerHeight() / 2) {
+                            if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
                                 $draggableStub.insertBefore($elem);
                             } else {
                                 $draggableStub.insertAfter($elem);
@@ -156,9 +162,8 @@ $(document).ready(function () {
         });
 
         function _setRelativePosition(event) {
-            var parentOffset = $rootElement.offset();
-            var relX = event.pageX - parentOffset.left;
-            var relY = event.pageY - parentOffset.top;
+            var relX = event.pageX - $elementOffset.x;
+            var relY = event.pageY - $elementOffset.y;
             $currentItem.css({
                 'top': relY + 'px',
                 'left': relX + 'px'
@@ -205,8 +210,8 @@ $(document).ready(function () {
 
     $('.draggable').makeDraggable();
     $('.draggable').on('MoveItem', function (e, info, to) {
-    	for(i = 0; i < info.data.length; i++){
-    		console.log("Track " + info.data[i].item + " was moved from playlist with name: " + info.data[i].name + ", to playlist with name: " + to);
-    	}
+        for (i = 0; i < info.data.length; i++) {
+            console.log("Track " + info.data[i].item + " was moved from playlist with name: " + info.data[i].name + ", to playlist with name: " + to);
+        }
     });
 });
