@@ -25,41 +25,50 @@
 		.draggable-list {
 			float: left;
 		}
-		
-		.draggable-item-shaper {
-			border: 2px lightgray solid;
+		.draggable-list-empty{
 			height: 30px;
 			width: 100px;
-			-webkit-user-select: none;
-			-moz-user-select: none;
-			user-select: none;
-			list-style-type: none;
+			border: 1px solid black;
 		}
 		.draggable-item-selected {
 			background: red;
+		}
+		#container {
+			position: absolute;
+			z-index: 1000;
+			border: 1px black solid;
+		}
+		.draggable{
+			height: 100%;
+			width: 100%;
+			position: absolute;
 		}
 	</style>
 </head>
 <body>
 	<div class="draggable">
-		<ul class="draggable-list" name="list-one">
+		<ul class="draggable-list" id="playlist1" name="first">
 			<li>1</li>
 			<li>2</li>
 			<li>3</li>
 			<li>4</li>
 		</ul>
-<!-- 		<div class="draggable-list">
-			<div>22</div>
-			<div>33</div>
-			<div>44</div>
-		</div> -->
 
-		<ul class="draggable-list" name="list-two">
+		<ul class="draggable-list" id="playlist2" name="second">
 			<li>6</li>
 			<li>7</li>
 			<li>8</li>
 			<li>9</li>
 		</ul>
+
+		<ul class="draggable-list" id="playlist3" name="third">
+			<li>11</li>
+			<li>12</li>
+			<li>13</li>
+			<li>14</li>
+		</ul>
+
+		<div id="container" class="container"></div>
 	</div>
 </body>
 <script type="text/javascript" src="jquery.js"></script>
