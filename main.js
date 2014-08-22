@@ -73,7 +73,6 @@ $(document).ready(function () {
         });
 
         this.mousemove(function(event) {
-
             if ($currentItem && $mousedown) {
                 var listCount = $currentItem.parent().children().length
 
@@ -102,7 +101,7 @@ $(document).ready(function () {
 						var parentPos = $draggableStub.parent().offset();
 
 						if ($elem.length > 0 && $mousedown) {
-							$elem.trigger('OnMerged', [$elem, $currentItem]);
+							$elem.trigger('MergeItems', [$elem, $currentItem, event.pageY]);
 							if (!$elem.hasClass('draggable-stub-empty')) {
 								if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
 									$draggableStub.insertBefore($elem);
@@ -196,11 +195,10 @@ $(document).ready(function () {
             return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
         }
 
-        $('.draggable').on('OnMerged', function(e, mergeTo, mergeElem) {
+        $('.draggable').on('MergeItems', function(e, mergeTo, mergeElem, pageY) {
             clearTimeout($timerId);
 			mergeToPos = mergeTo.offset();
-			mergeElemPos = mergeElem.offset();
-            if ((!mergeTo.hasClass('draggable-stub')) && (mergeToPos.top + 0.15*$currentItem.height() < mergeElemPos.top) && (mergeToPos.top + 0.85*$currentItem.height() > mergeElemPos.top)) {
+            if ((!mergeTo.hasClass('draggable-stub')) && (mergeToPos.top + 0.15*$currentItem.height() < pageY) && (mergeToPos.top + 0.85*$currentItem.height() > pageY)) {
                 $timerId = setTimeout(function() {
                     if (mergeElem && mergeTo) {
                         if ($currentItem.hasClass('container') && $('.draggable-item-selected').length > 0) {
