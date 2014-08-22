@@ -5,7 +5,6 @@ $(document).ready(function () {
         var $rootElement = this;
         var $currentItem = null;
         var $draggableStub = $('<li>').toggleClass('draggable-item', true).toggleClass('draggable-stub', true);
-        var $draggableStubEmpty = $('<li>').toggleClass('draggable-item', true).toggleClass('draggable-stub-empty', true);
         var $container = $('#container');
         var $parentId = "";
         var $movingInfo = { "data": [] };
@@ -93,19 +92,26 @@ $(document).ready(function () {
                 _setRelativePosition(event);
                 var $elem = _getCurrentTarget(event);
                 if ($elem) {
-                    var childPos = $currentItem.offset();
-                    var parentPos = $draggableStub.parent().offset();
+					if ($elem.hasClass('draggable-list'))
+					{
+						$elem.append($draggableStub);
+					}
+					else 
+					{
+						var childPos = $currentItem.offset();
+						var parentPos = $draggableStub.parent().offset();
 
-                    if ($elem.length > 0 && $mousedown) {
-                        $elem.trigger('OnMerged', [$elem, $currentItem]);
-                        if (!$elem.hasClass('draggable-stub-empty')) {
-                            if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
-                                $draggableStub.insertBefore($elem);
-                            } else {
-                                $draggableStub.insertAfter($elem);
-                            }
-                        }
-                    }
+						if ($elem.length > 0 && $mousedown) {
+							$elem.trigger('OnMerged', [$elem, $currentItem]);
+							if (!$elem.hasClass('draggable-stub-empty')) {
+								if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
+									$draggableStub.insertBefore($elem);
+								} else {
+									$draggableStub.insertAfter($elem);
+								}
+							}
+						}
+					}
                 };
             }
         });
@@ -155,9 +161,9 @@ $(document).ready(function () {
                     }
                 };
             };
-            if ($('#' + $parentId).children().length < 1) {
-                $('#' + $parentId).append($draggableStubEmpty);
-            };
+            // if ($('#' + $parentId).children().length < 1) {
+                // $('#' + $parentId).append($draggableStubEmpty);
+            // };
             $draggableStub.detach();
         });
 
@@ -182,6 +188,10 @@ $(document).ready(function () {
             if ($elem.hasClass('draggable-stub-empty')) {
                 return $elem;
             };
+			if ($elem.closest('.draggable-list').find('li').length === 0)
+			{
+				return $elem.closest('.draggable-list');
+			};
             return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
         }
 
