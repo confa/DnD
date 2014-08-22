@@ -143,7 +143,7 @@ $(document).ready(function () {
                         for (i = 0; i < $currentItem.children().length; i++) {
                             $items += $($currentItem.children()[i]).html() + " ";
                         }
-                        $currentItem.trigger('MoveItem', [$movingInfo, $draggableStub.parent().attr("name")]);
+                        $currentItem.trigger('OnDropped', [$movingInfo, $draggableStub.parent().attr("name")]);
                         $movingInfo.data.length = 0;
 
                         $currentItem.removeAttr('style');
@@ -153,7 +153,7 @@ $(document).ready(function () {
                         $('.draggable-item-selected').toggleClass('draggable-item-selected', false)
                         $currentItem = null;
                     } else if (!$currentItem.hasClass('draggable-item-selected') && $currentItem.hasClass('dragging')) {
-                        $currentItem.trigger('MoveItem', [$movingInfo, $draggableStub.parent().attr("name")]);
+                        $currentItem.trigger('OnDropped', [$movingInfo, $draggableStub.parent().attr("name")]);
                         $movingInfo.data.length = 0;
                         $currentItem.insertAfter($draggableStub);
                         $currentItem.toggleClass('dragging', false);
@@ -204,6 +204,7 @@ $(document).ready(function () {
                             for (i = 0; i < $currentItem.children().length; i++)
                                 mergeTo.text(mergeTo.html() + ' ' + $($currentItem.children()[i]).html());
                             $currentItem.removeAttr('style');
+							mergeTo.trigger('OnCombined', [mergeTo.text()]);
                             $currentItem.children().detach();
                             $currentItem.toggleClass('dragging', false);
                             $('.draggable-item-selected').toggleClass('draggable-item-selected', false)
@@ -219,9 +220,12 @@ $(document).ready(function () {
     };
 
     $('.draggable').makeDraggable();
-    $('.draggable').on('MoveItem', function (e, info, to) {
+    $('.draggable').on('OnDropped', function (e, info, to) {
         for (i = 0; i < info.data.length; i++) {
             console.log("Track " + info.data[i].item + " was moved from playlist with name: " + info.data[i].name + ", to playlist with name: " + to);
         }
     });
+	$('.draggable').on('OnCombined', function(e, combinedText) {
+		console.log(combinedText);
+	});
 });
