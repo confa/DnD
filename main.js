@@ -49,11 +49,14 @@ $(document).ready(function () {
                         $indexFirst = $currentItem.index();
                         $indexLast = $('.draggable-item-selected').index();
                     }
-
+					
+					var currentChildren = $currentItem.parent().children();
+					
                     for (i = $indexFirst; i <= $indexLast; i++) {
-                        if (!$($currentItem.parent().children()[i]).hasClass('draggable-item-selected')) {
-                            $($currentItem.parent().children()[i]).toggleClass('draggable-item-selected', true);
-                            $movingInfo.data.push({ "name": $($currentItem.parent()).attr('name'), "item": $($currentItem.parent().children()[i]).html() });
+						var $currentChild = $(currentChildren[i]);
+                        if (!$currentChild.hasClass('draggable-item-selected')) {
+                            $currentChild.toggleClass('draggable-item-selected', true);
+                            $movingInfo.data.push({ "name": $currentChild.attr('name'), "item": $currentChild.html() });
                         }
                     }
                 } else {
