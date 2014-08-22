@@ -9,6 +9,7 @@ $(document).ready(function () {
         var $parentId = "";
         var $movingInfo = { "data": [] };
         var $timerId = null;
+        var lastEvent = null;
 
         var $elementOffset = { x: 0, y: 0 };
 
@@ -76,6 +77,7 @@ $(document).ready(function () {
         });
 
         this.mousemove(function(event) {
+        	lastEvent = event;
             if ($currentItem && $mousedown) {
                 var listCount = $currentItem.parent().children().length
 
@@ -104,7 +106,14 @@ $(document).ready(function () {
 						var parentPos = $draggableStub.parent().offset();
 
 						if ($elem.length > 0 && $mousedown) {
-							$elem.trigger('MergeItems', [$elem, $currentItem, event.pageY]);
+							clearTimeout($timerId);
+							var $savedItem = $currentItem;
+							$timerId = setTimeout(function() {
+								var $hoverElement = _getCurrentTarget(lastEvent);
+								if($mousedown && $elem.is($hoverElement)) {
+									$elem.trigger('MergeItems', [$elem, $savedItem, event.pageY]);
+								}
+							}, 2000);
 							if (!$elem.hasClass('draggable-stub-empty')) {
 								if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
 									$draggableStub.insertBefore($elem);
@@ -190,35 +199,32 @@ $(document).ready(function () {
             $currentItem.show();
             if ($elem.hasClass('draggable-stub-empty')) {
                 return $elem;
-            };
+            }
 			if ($elem.closest('.draggable-list').find('li').length === 0)
 			{
 				return $elem.closest('.draggable-list');
-			};
+			}
             return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
         }
 
         $('.draggable').on('MergeItems', function(e, mergeTo, mergeElem, pageY) {
-            clearTimeout($timerId);
 			mergeToPos = mergeTo.offset();
             if ((!mergeTo.hasClass('draggable-stub')) && (mergeToPos.top + 0.15*$('.draggable-item').height() < pageY) && (mergeToPos.top + 0.85*$('.draggable-item').height() > pageY)) {
-                $timerId = setTimeout(function() {
-                    if (mergeElem && mergeTo) {
-                        if ($currentItem.hasClass('container') && $('.draggable-item-selected').length > 0) {
-                            for (i = 0; i < $currentItem.children().length; i++)
-                                mergeTo.text(mergeTo.html() + ' ' + $($currentItem.children()[i]).html());
-                            $currentItem.removeAttr('style');
-							mergeTo.trigger('OnCombined', [mergeTo.text()]);
-                            $currentItem.children().detach();
-                            $currentItem.toggleClass('dragging', false);
-                            $('.draggable-item-selected').toggleClass('draggable-item-selected', false)
-                        } else {
-                            mergeTo.text(mergeTo.html() + ' ' + mergeElem.html());
-                            $currentItem.detach();
-                        }
-                        $currentItem = null;
+                if (mergeElem && mergeTo) {
+                    if ($currentItem.hasClass('container') && $('.draggable-item-selected').length > 0) {
+                        for (i = 0; i < $currentItem.children().length; i++)
+                            mergeTo.text(mergeTo.html() + ' ' + $($currentItem.children()[i]).html());
+                        $currentItem.removeAttr('style');
+						mergeTo.trigger('OnCombined', [mergeTo.text()]);
+                        $currentItem.children().detach();
+                        $currentItem.toggleClass('dragging', false);
+                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false)
+                    } else {
+                        mergeTo.text(mergeTo.html() + ' ' + mergeElem.html());
+                        $currentItem.detach();
                     }
-                }, 2000);
+                    $currentItem = null;
+                }
             }
         })
     };
