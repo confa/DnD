@@ -1,185 +1,212 @@
-$(document).ready(function() {
+$(document).ready(function () {
 
-	$.fn.makeDraggable = function(options) {
-		var $mousedown = false;
-		var $rootElement = this;
-		var $currentItem = null;
-		var $draggableStub = $('<li>').toggleClass('draggable-item', true).toggleClass('draggable-stub', true);
-		var $draggableStubEmpty = $('<li>').toggleClass('draggable-item', true).toggleClass('draggable-stub-empty', true); 
-		var $container = $('#container');
-		var $parentId = "";
-		var $movingInfo = {"data" : []};
-		var $timerId = null;
+    $.fn.makeDraggable = function(options) {
+        var $mousedown = false;
+        var $rootElement = this;
+        var $currentItem = null;
+        var $draggableStub = $('<li>').toggleClass('draggable-item', true).toggleClass('draggable-stub', true);
+        var $draggableStubEmpty = $('<li>').toggleClass('draggable-item', true).toggleClass('draggable-stub-empty', true);
+        var $container = $('#container');
+        var $parentId = "";
+        var $movingInfo = { "data": [] };
+        var $timerId = null;
 
-		this.find('.draggable-list > li').each(function (index, item) {
-			var $item = $(item);
-			$item.toggleClass('draggable-item', true);
-			$item.mousedown(function (event) {
-				$mousedown = true;
-				$currentItem = $(this);
+        this.find('.draggable-list > li').each(function(index, item) {
+            var $item = $(item);
+            $item.toggleClass('draggable-item', true);
+            $item.mousedown(function(event) {
+                $mousedown = true;
+                $currentItem = $(this);
+                if (!$currentItem.hasClass('draggable-item-selected') && !event.shiftKey) {
+                	$movingInfo.data.push({ "name": $currentItem.parent().attr('name'), "item": $currentItem.html() });
+                };
 
-				if(event.ctrlKey){
-					$currentItem.toggleClass('selected', true);
-					var $some = {}; 
-					$some = {"name" : $currentItem.parent().attr('name'), "item" : $currentItem.html()};
-					$movingInfo.data.push($some);
-				}
-				else if(event.shiftKey)
-				{
-					////////// SHIFT ACTION
-				}
-				$parentId = $currentItem.parent().attr('id');
-			});
-		});
-
-			this.mousemove(function (event) {
-
-				if ($currentItem && $mousedown) {
-					var listCount = $currentItem.parent().children().length
-
-					if ($currentItem.hasClass('selected')) {
-						$currentItem = $container;
-
-					$currentItem.append($('.selected'));
-					};
-					$currentItem.toggleClass('dragging', true);
-					$currentItem.toggleClass('dragging-item', true);
-					$currentItem.show();
-
-					if (!$currentItem.hasClass	('container')) {
-						$draggableStub.insertAfter($currentItem.children().last());
-					};
-					$currentItem.toggleClass('dragging', true);
-
-					_setRelativePosition(event);
-				var $elem = _getCurrentTarget(event);
-				if($elem) {
-					var childPos = $currentItem.offset();
-					var parentPos = $draggableStub.parent().offset();
-
-					if($elem && $mousedown) {
-						$elem.trigger('MergeItems', [$elem, $currentItem]);
-
-
-					if (!$elem.hasClass('draggable-stub-empty')) {
-						if(childPos && parentPos && childPos.top - parentPos.top < $currentItem.outerHeight() / 2) {
-							$draggableStub.insertBefore($elem);
-						} else {
-							$draggableStub.insertAfter($elem);
+                if (event.ctrlKey) {
+                	if ($currentItem.hasClass('draggable-item-selected')) {
+						$currentItem.toggleClass('draggable-item-selected', false);
+						for(i = 0; i < $movingInfo.data.length; i++){
+							if ($movingInfo.data[i].name == $currentItem.parent().attr('name') && $movingInfo.data[i].item == $currentItem.html()){
+								$movingInfo.data.splice(i, 1);
+							}
 						}
-					}
-				}
-				};
-		}
-	});
+                	}
+                	else {
+                		$currentItem.toggleClass('draggable-item-selected', true);
+                	}
+                } else if (event.shiftKey) {
+                    var $indexFirst = -1;
+                    var $indexLast = -1;
+                    if ($('.draggable-item-selected').index() < $currentItem.index()) {
+                        $indexFirst = $('.draggable-item-selected').index();
+                        $indexLast = $currentItem.index();
+                    } else {
+                        $indexFirst = $currentItem.index();
+                        $indexLast = $('.draggable-item-selected').index();
+                    }
 
-		$(document).mouseup(function() {
-			$mousedown = false;
-			if($currentItem) {
+                    for (i = $indexFirst; i <= $indexLast; i++) {
+                        if (!$($currentItem.parent().children()[i]).hasClass('draggable-item-selected')) {
+                            $($currentItem.parent().children()[i]).toggleClass('draggable-item-selected', true);
+                            $movingInfo.data.push({ "name": $($currentItem.parent()).attr('name'), "item": $($currentItem.parent().children()[i]).html() });
+                        }
+                    }
+                } else {
+                    if (!$currentItem.parent().children().hasClass('draggable-item-selected') && $('.draggable-item-selected').length > 0) {
+                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+                    } else if ($currentItem.parent().children().hasClass('draggable-item-selected') && $('.draggable-item-selected').length > 0 && !$currentItem.hasClass('draggable-item-selected')) {
+                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+                    } else if ($currentItem.hasClass('draggable-item-selected') && $('.draggable-item-selected').length < 2) {
+                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+                    } else if ($('.draggable-item-selected').length == 1) {
+                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+                    }
+                    $currentItem.toggleClass('draggable-item-selected', true);
+                }
+                $parentId = $currentItem.parent().attr('id');
+            });
+        });
 
-				var $element = _getCurrentTarget(event);
+        this.mousemove(function(event) {
 
-				if ($element.length == 0) {
-					if($currentItem.hasClass('container')){
-						$('#' +$parentId).append($currentItem.children())
-						$currentItem= null;
+            if ($currentItem && $mousedown) {
+                var listCount = $currentItem.parent().children().length
 
-					}
-					else{
-						$currentItem.removeAttr('style');
-						$currentItem.toggleClass('dragging', false);
-					}
-				}
-				else{
+                if ($currentItem.hasClass('draggable-item-selected')) {
+                    $currentItem = $container;
 
-				if ($element.hasClass('draggable-stub-empty')) {
-					$element.replaceWith($draggableStub);
-				};
+                    $currentItem.append($('.draggable-item-selected'));
+                };
+                $currentItem.toggleClass('dragging', true);
+                $currentItem.show();
 
-				if ($currentItem.children().length > 0) {
-					var $items = "Items "
-					for (i = 0; i < $currentItem.children().length; i++) {
-						$items += $($currentItem.children()[i]).html() + " ";
-					}
-					$currentItem.trigger('MoveItem', [$items, $('#' + $parentId).attr('name'), $draggableStub.parent().attr("name")]);
+                if (!$currentItem.hasClass('container')) {
+                    $draggableStub.insertAfter($currentItem.children().last());
+                };
+                $currentItem.toggleClass('dragging', true);
 
-				$currentItem.removeAttr('style');
+                _setRelativePosition(event);
+                var $elem = _getCurrentTarget(event);
+                if ($elem) {
+                    var childPos = $currentItem.offset();
+                    var parentPos = $draggableStub.parent().offset();
 
-				$currentItem.children().insertAfter($draggableStub);
-				$currentItem.toggleClass('dragging', false);
-				$('.selected').toggleClass('selected', false)
-				$currentItem = null;
-			}
-			else if(!$currentItem.hasClass('selected') && $currentItem.hasClass('dragging')) {
-				$currentItem.trigger('MoveItem', [$currentItem.html(), $currentItem.parent().attr('name'), $draggableStub.parent().attr("name")]);
-				$currentItem.insertAfter($draggableStub);
-				$currentItem.toggleClass('dragging', false);
-				$currentItem = null;
-			}
-		};
-	};
-			if ($('#' + $parentId).children().length < 1) {
-				$('#' + $parentId).append($draggableStubEmpty);
-			};
-			$draggableStub.detach();
-		});
+                    if ($elem.length > 0 && $mousedown) {
+                        $elem.trigger('MergeItems', [$elem, $currentItem]);
+                        if (!$elem.hasClass('draggable-stub-empty')) {
+                            if (childPos && parentPos && childPos.top - parentPos.top < $currentItem.outerHeight() / 2) {
+                                $draggableStub.insertBefore($elem);
+                            } else {
+                                $draggableStub.insertAfter($elem);
+                            }
+                        }
+                    }
+                };
+            }
+        });
 
-		function _setRelativePosition(event) {
-			var parentOffset = $rootElement.offset();
-			var relX = event.pageX - parentOffset.left;
-			var relY = event.pageY - parentOffset.top;
-			$currentItem.css({
-				'top': relY + 'px',
-				'left': relX + 'px'
-			});	
-		}
+        $(document).mouseup(function() {
+            $mousedown = false;
+            clearTimeout($timerId);
+            if ($currentItem) {
 
-		function _getCurrentTarget(event) {
-			if (navigator.userAgent.match('MSIE') || navigator.userAgent.match('Gecko')) {
-				var x = event.clientX, y = event.clientY;
-			} else {
-				var x = event.pageX, y = event.pageY;
-			}
-			$currentItem.hide();
-			var $elem = $(document.elementFromPoint(x,y));
-			$currentItem.show();
-			if ($elem.hasClass('draggable-stub-empty')) {
-				return $elem;
-			};
-			return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
-		}
+                var $element = _getCurrentTarget(event);
 
-$('.draggable').on('MergeItems', function (e, mergeTo, mergeElem){
-		clearTimeout($timerId);
-						if(!mergeTo.hasClass('draggable-stub')) {
-							$timerId = setTimeout(function() {
-									if(mergeElem && mergeTo ) {
-										if ($currentItem.hasClass('container')) {
-											for(i = 0; i < $currentItem.children().length; i++)
-												mergeTo.text(mergeTo.html() + ' ' + $($currentItem.children()[i]).html());
-											$currentItem.removeAttr('style');
+                if ($element.length == 0) {
+                    if ($currentItem.hasClass('container')) {
+                        $('#' + $parentId).append($currentItem.children())
+                        $currentItem = null;
 
-											$currentItem.children().insertAfter($draggableStub);
-											$currentItem.toggleClass('dragging', false);
-											$('.selected').toggleClass('selected', false)
-											//$currentItem = null;
-										}
-										else{
-											mergeTo.text(mergeTo.html() + ' ' + mergeElem.html());
-											$currentItem.detach();
-										}
-											$currentItem = null;
+                    } else {
+                        $currentItem.removeAttr('style');
+                        $currentItem.toggleClass('dragging', false);
+                    }
+                } else {
 
-								}
-							}, 2000);
-						}
-	})
+                    if ($element.hasClass('draggable-stub-empty')) {
+                        $element.replaceWith($draggableStub);
+                    };
 
+                    if ($currentItem.children().length > 0) {
+                        var $items = "Items "
+                        for (i = 0; i < $currentItem.children().length; i++) {
+                            $items += $($currentItem.children()[i]).html() + " ";
+                        }
+                        $currentItem.trigger('MoveItem', [$movingInfo, $draggableStub.parent().attr("name")]);
+                        $movingInfo.data.length = 0;
 
-	};
+                        $currentItem.removeAttr('style');
 
-	$('.draggable').makeDraggable();
-	$('.draggable').on('MoveItem', function (e, name, from, to){
-		console.log("Track " + name + " was moved from playlist with name: " + from + ", to playlist with name: " + to);
-	});
+                        $currentItem.children().insertAfter($draggableStub);
+                        $currentItem.toggleClass('dragging', false);
+                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false)
+                        $currentItem = null;
+                    } else if (!$currentItem.hasClass('draggable-item-selected') && $currentItem.hasClass('dragging')) {
+                        $currentItem.trigger('MoveItem', [$movingInfo, $draggableStub.parent().attr("name")]);
+                        $movingInfo.data.length = 0;
+                        $currentItem.insertAfter($draggableStub);
+                        $currentItem.toggleClass('dragging', false);
+                        $currentItem = null;
+                    }
+                };
+            };
+            if ($('#' + $parentId).children().length < 1) {
+                $('#' + $parentId).append($draggableStubEmpty);
+            };
+            $draggableStub.detach();
+        });
+
+        function _setRelativePosition(event) {
+            var parentOffset = $rootElement.offset();
+            var relX = event.pageX - parentOffset.left;
+            var relY = event.pageY - parentOffset.top;
+            $currentItem.css({
+                'top': relY + 'px',
+                'left': relX + 'px'
+            });
+        }
+
+        function _getCurrentTarget(event) {
+            if (navigator.userAgent.match('MSIE') || navigator.userAgent.match('Gecko')) {
+                var x = event.clientX, y = event.clientY;
+            } else {
+                var x = event.pageX, y = event.pageY;
+            }
+            $currentItem.hide();
+            var $elem = $(document.elementFromPoint(x, y));
+            $currentItem.show();
+            if ($elem.hasClass('draggable-stub-empty')) {
+                return $elem;
+            };
+            return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
+        }
+
+        $('.draggable').on('MergeItems', function(e, mergeTo, mergeElem) {
+            clearTimeout($timerId);
+            if (!mergeTo.hasClass('draggable-stub')) {
+                $timerId = setTimeout(function() {
+                    if (mergeElem && mergeTo) {
+                        if ($currentItem.hasClass('container') && $('.draggable-item-selected').length > 0) {
+                            for (i = 0; i < $currentItem.children().length; i++)
+                                mergeTo.text(mergeTo.html() + ' ' + $($currentItem.children()[i]).html());
+                            $currentItem.removeAttr('style');
+                            $currentItem.children().detach();
+                            $currentItem.toggleClass('dragging', false);
+                            $('.draggable-item-selected').toggleClass('draggable-item-selected', false)
+                        } else {
+                            mergeTo.text(mergeTo.html() + ' ' + mergeElem.html());
+                            $currentItem.detach();
+                        }
+                        $currentItem = null;
+                    }
+                }, 2000);
+            }
+        })
+    };
+
+    $('.draggable').makeDraggable();
+    $('.draggable').on('MoveItem', function (e, info, to) {
+    	for(i = 0; i < info.data.length; i++){
+    		console.log("Track " + info.data[i].item + " was moved from playlist with name: " + info.data[i].name + ", to playlist with name: " + to);
+    	}
+    });
 });
