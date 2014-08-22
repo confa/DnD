@@ -57,7 +57,7 @@ $(document).ready(function () {
 						var $currentChild = $(currentChildren[i]);
                         if (!$currentChild.hasClass('draggable-item-selected')) {
                             $currentChild.toggleClass('draggable-item-selected', true);
-                            $movingInfo.data.push({ "name": $currentChild.attr('name'), "item": $currentChild.html() });
+                            $movingInfo.data.push({ "name": $currentChild.parent().attr('name'), "item": $currentChild.html() });
                         }
                     }
                 } else {
