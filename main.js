@@ -109,10 +109,18 @@ $(document).ready(function () {
             $draggableStub.detach();
         });
 		
-		$('.draggable').on('add', function(e, $button, data) {
+		$('.draggable-list').on('add', function(e, data) {
 			var $newItem = $('<li>').toggleClass('draggable-item', true).text(data);
 			$newItem.mousedown(_makeDraggable);
-			$newItem.insertBefore($button);
+			$(this).append($newItem);
+		});
+		
+		$('.draggable-list').on('sort', function(e, dir) {
+			$list = $(this);
+			var sorted = $list.find("> .draggable-item").sort(function(a, b) {
+				return $(a).text().toLowerCase() > $(b).text().toLowerCase() ? dir : -dir;
+			});
+			$list.prepend(sorted);
 		});
 		
 		function _makeDraggable(event) {
@@ -233,8 +241,11 @@ $(document).ready(function () {
         console.log(combinedText);
     });
 	
-	$('.draggable-btn-add').click(function() {
-		$('.draggable').trigger('add', [$(this), 'Some text']);
+	$('.draggable-btn.add').click(function() {
+		$(this).parent().trigger('add', ['Some text']);
 	});
 	
+	$('.draggable-btn.sort').click(function() {
+		$(this).parent().trigger('sort', [-1]);
+	});
 });

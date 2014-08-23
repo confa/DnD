@@ -14,12 +14,18 @@
 			-moz-user-select: none;
 			user-select: none;
 		}
-		.draggable-btn-add {
+		.draggable-btn {
 			height:30px;
-			width:102px;
 			cursor: pointer;
-			margin: 0 auto;
 		}
+		.draggable-btn.add {
+			width:40%;
+		}
+		
+		.draggable-btn.sort {
+			width: 30%;
+		}
+		
 		.draggable-item:hover {
 			background: gray;
 			cursor: pointer;
@@ -62,7 +68,8 @@
 			<li>2</li>
 			<li>3</li>
 			<li>4</li>
-			<button class="draggable-btn-add">Add</button>
+			<button class="draggable-btn add">Add</button>
+			<button class="draggable-btn sort">Sort</button>
 		</ul>
 
 		<ul class="draggable-list" id="playlist2" name="second">
@@ -70,7 +77,8 @@
 			<li>7</li>
 			<li>8</li>
 			<li>9</li>
-			<button class="draggable-btn-add">Add</button>
+			<button class="draggable-btn add">Add</button>
+			<button class="draggable-btn sort">Sort</button>
 		</ul>
 
 		<ul class="draggable-list" id="playlist3" name="third">
@@ -78,7 +86,8 @@
 			<li>12</li>
 			<li>13</li>
 			<li>14</li>
-			<button class="draggable-btn-add">Add</button>
+			<button class="draggable-btn add">Add</button>
+			<button class="draggable-btn sort">Sort</button>
 		</ul>
 
 		<div id="container" class="container"></div>
