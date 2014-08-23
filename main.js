@@ -112,7 +112,7 @@ $(document).ready(function () {
 		$('.draggable-list').on('add', function(e, data) {
 			var $newItem = $('<li>').toggleClass('draggable-item', true).text(data);
 			$newItem.mousedown(_makeDraggable);
-			$(this).append($newItem);
+			$(this).prepend($newItem);
 		});
 		
 		$('.draggable-list').on('sort', function(e, dir) {
