@@ -109,16 +109,16 @@ $(document).ready(function () {
             $draggableStub.detach();
         });
 		
-		$('.draggable').on('add', function(e, $button, data) {
+		$('.draggable-list').on('add', function(e, data) {
 			var $newItem = $('<li>').toggleClass('draggable-item', true).text(data);
 			$newItem.mousedown(_makeDraggable);
-			$newItem.insertBefore($button);
+			$(this).append($newItem);
 		});
 		
-		$('.draggable').on('sort', function(e, $button) {
-			var $list = $button.parent();
+		$('.draggable-list').on('sort', function(e, dir) {
+			$list = $(this);
 			var sorted = $list.find("> .draggable-item").sort(function(a, b) {
-				return $(a).text().toLowerCase() > $(b).text().toLowerCase() ? 1 : -1;
+				return $(a).text().toLowerCase() > $(b).text().toLowerCase() ? dir : -dir;
 			});
 			$list.prepend(sorted);
 		});
@@ -242,10 +242,10 @@ $(document).ready(function () {
     });
 	
 	$('.draggable-btn.add').click(function() {
-		$('.draggable').trigger('add', [$(this), 'Some text']);
+		$(this).parent().trigger('add', ['Some text']);
 	});
 	
 	$('.draggable-btn.sort').click(function() {
-		$('.draggable').trigger('sort', [$(this)]);
+		$(this).parent().trigger('sort', [-1]);
 	});
 });
