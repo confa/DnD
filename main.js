@@ -149,14 +149,15 @@ $(document).ready(function () {
                 } else {
 
                     if ($element.hasClass('delete-area')) {
-                        $currentItem.trigger("DeleteItem");
+                        $currentItem.trigger("DeleteItem", [$currentItem]);
+
                     }
 
                     if ($element.hasClass('draggable-stub-empty')) {
                         $element.replaceWith($draggableStub);
                     }
 
-                    if ($currentItem.children().length > 0) {
+                    if ($currentItem.children().length > 0 && !$element.hasClass('delete-area')) {
                         var $items = "Items "
                         for (i = 0; i < $currentItem.children().length; i++) {
                             $items += $($currentItem.children()[i]).html() + " ";
@@ -166,7 +167,7 @@ $(document).ready(function () {
                         $currentItem.removeAttr('style');
                         $currentItem.children().insertAfter($draggableStub);
                         $currentItem.toggleClass('dragging', false);
-                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false)
+                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
                         $currentItem = null;
                     } else if (!$currentItem.hasClass('draggable-item-selected') && $currentItem.hasClass('dragging')) {
                         $currentItem.trigger('OnDropped', [movingInfo, $draggableStub.parent().attr("name")]);
@@ -258,11 +259,8 @@ $(document).ready(function () {
         console.log(combinedText);
     });
 
-    $('.container').on('DeleteItem', function (){
-        var $this = $(this);
-        var elems = $(this).children();
-        $this.detach(elems[0].tagName);
-        $this = null;
+    $('.container').on('DeleteItem', function (e, container){
+        container.empty();
         $('.delete-area').css({
                     'border': 'solid black 1px'
                 })
