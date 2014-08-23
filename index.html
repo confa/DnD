@@ -47,6 +47,13 @@
 			width: 100%;
 			position: absolute;
 		}
+		.delete-area{
+			width: 200px;
+			height: 200px;
+			border: solid black 1px;
+			//visibility: hidden;
+			float: left;
+		}
 	</style>
 </head>
 <body>
@@ -73,6 +80,12 @@
 		</ul>
 
 		<div id="container" class="container"></div>
+
+		<input type="button" value="delete" id="delBtn"/>
+		<input type="button" value="shuffle" id="shflBtn" />
+
+		<div class="delete-area">Move here to delete</div>
+
 	</div>
 </body>
 <script type="text/javascript" src="jquery.js"></script>

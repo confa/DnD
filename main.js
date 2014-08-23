@@ -11,6 +11,7 @@ $(document).ready(function () {
         var lastEvent = null;
         var elementOffset = { x: 0, y: 0 };
         var mousedown = false;
+        var deleteFlag = false;
 
         this.find('.draggable-list > li').each(function(index, item) {
             var $item = $(item);
@@ -76,6 +77,18 @@ $(document).ready(function () {
         this.mousemove(function(event) {
             lastEvent = event;
             if ($currentItem && mousedown) {
+
+            	var $deleteArea = _getCurrentTarget(lastEvent);
+            	if($deleteArea.hasClass('delete-area')){
+            		console.log("in");
+                    _setDeleteAreaCss();
+                    deleteFlag = true;
+            	}
+                else{
+                    _setDeleteAreaCss()
+                    deleteFlag = false;
+                }
+
                 var listCount = $currentItem.parent().children().length
 
                 if ($currentItem.hasClass('draggable-item-selected')) {
@@ -94,7 +107,7 @@ $(document).ready(function () {
                 if ($elem) {
                     if ($elem.hasClass('draggable-list')) {
                         $elem.append($draggableStub);
-                    } else {
+                    } else if (!$elem.hasClass('delete-area')){
                         var childPos = $currentItem.offset();
                         var parentPos = $draggableStub.parent().offset();
 
@@ -134,6 +147,10 @@ $(document).ready(function () {
                         $currentItem.toggleClass('dragging', false);
                     }
                 } else {
+
+                    if ($element.hasClass('delete-area')) {
+                        $currentItem.trigger("DeleteItem");
+                    }
 
                     if ($element.hasClass('draggable-stub-empty')) {
                         $element.replaceWith($draggableStub);
@@ -185,10 +202,28 @@ $(document).ready(function () {
             if ($elem.hasClass('draggable-stub-empty')) {
                 return $elem;
             }
+
+            if($elem.hasClass('delete-area')){
+            	return $elem;
+            }
+
             if ($elem.closest('.draggable-list').find('li').length === 0) {
                 return $elem.closest('.draggable-list');
             }
             return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
+        }
+
+        function _setDeleteAreaCss(){
+            if (deleteFlag == true){
+                $('.delete-area').css({
+                        'border': 'solid red 3px'
+                })
+            }
+            else{
+                $('.delete-area').css({
+                    'border': 'solid black 1px'
+                })
+            }
         }
 
         $('.draggable').on('MergeItems', function(e, mergeTo, mergeElem, pageY) {
@@ -222,4 +257,24 @@ $(document).ready(function () {
     $('.draggable').on('OnCombined', function (e, combinedText) {
         console.log(combinedText);
     });
+
+    $('.container').on('DeleteItem', function (){
+        var $this = $(this);
+        var elems = $(this).children();
+        $this.detach(elems[0].tagName);
+        $this = null;
+        $('.delete-area').css({
+                    'border': 'solid black 1px'
+                })
+        deleteFlag = false;
+    });
+
+    $('.draggable-list').on('ShuffleItems', function (){
+        var $this = $(this);
+        var elems = $this.children();
+        elems.sort(function() { return (Math.round(Math.random())-0.5); });  
+        $this.remove(elems[0].tagName);  
+        for(var i=0; i < elems.length; i++)
+            $this.append(elems[i]);     
+    })
 });
