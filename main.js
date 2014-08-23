@@ -115,6 +115,14 @@ $(document).ready(function () {
 			$newItem.insertBefore($button);
 		});
 		
+		$('.draggable').on('sort', function(e, $button) {
+			var $list = $button.parent();
+			var sorted = $list.find("> .draggable-item").sort(function(a, b) {
+				return $(a).text().toLowerCase() > $(b).text().toLowerCase() ? 1 : -1;
+			});
+			$list.prepend(sorted);
+		});
+		
 		function _makeDraggable(event) {
 			mousedown = true;
                 $currentItem = $(this);
@@ -233,8 +241,11 @@ $(document).ready(function () {
         console.log(combinedText);
     });
 	
-	$('.draggable-btn-add').click(function() {
+	$('.draggable-btn.add').click(function() {
 		$('.draggable').trigger('add', [$(this), 'Some text']);
 	});
 	
+	$('.draggable-btn.sort').click(function() {
+		$('.draggable').trigger('sort', [$(this)]);
+	});
 });
