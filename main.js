@@ -80,7 +80,7 @@ $(document).ready(function () {
                 } else {
 
                     if ($element.hasClass('delete-area')) {
-                        $currentItem.trigger("DeleteItem");
+                        $currentItem.trigger("delete");
                     }
 
                     if ($currentItem != null && $currentItem.children().length > 0 && !$element.hasClass('delete-area')) {
@@ -223,22 +223,6 @@ $(document).ready(function () {
             _setDeleteAreaCss();
         }
 
-        $('.container').on('DeleteItem', function (e){
-            $currentItem.empty();
-            _clearContainer();
-            deleteFlag = false;
-            _setDeleteAreaCss();
-        });
-
-        $('.draggable-list').on('ShuffleItems', function (){
-            var $this = $(this);
-            var elems = $this.children();
-            elems.sort(function() { return (Math.round(Math.random())-0.5); });  
-            $this.remove(elems[0].tagName);  
-            for(var i=0; i < elems.length; i++)
-                $this.append(elems[i]);     
-        })
-
         $('.draggable').on('MergeItems', function(e, mergeTo, mergeElem, pageY) {
             mergeToPos = mergeTo.offset();
             if ((!mergeTo.hasClass('draggable-stub')) && (mergeToPos.top + 0.15 * $('.draggable-item').height() < pageY) && (mergeToPos.top + 0.85 * $('.draggable-item').height() > pageY)) {
@@ -256,6 +240,21 @@ $(document).ready(function () {
                     _clearContainer();  
                 }
             }
+        })
+
+        $('.container').on('delete', function (e){
+            $currentItem.empty();
+            _clearContainer();
+            deleteFlag = false;
+            _setDeleteAreaCss();
+        });
+
+        $('.draggable-list').on('shuffle', function (){
+            var $this = $(this);
+            var elems = $this.children('li');
+            elems.sort(function() { return (Math.round(Math.random())-0.5); });  
+            $this.remove(elems[0].tagName);  
+            $this.prepend(elems);     
         })
 
         $('.draggable-list').on('add', function(e, data) {
@@ -290,4 +289,8 @@ $(document).ready(function () {
 	$('.draggable-btn.sort').click(function() {
 		$(this).parent().trigger('sort', [-1]);
 	});
+
+    $('.draggable-btn.shuffle').click(function() {
+        $(this).parent().trigger('shuffle');
+    });
 });
