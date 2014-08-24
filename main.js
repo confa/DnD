@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).ready(function() {
 
     $.fn.makeDraggable = function(options) {
         var $rootElement = this;
@@ -19,7 +19,7 @@ $(document).ready(function () {
             $item.mousedown(_makeDraggable);
         });
 
-				
+
         this.mousemove(function(event) {
             lastEvent = event;
             if ($currentItem && mousedown) {
@@ -40,7 +40,7 @@ $(document).ready(function () {
                 if ($elem) {
                     if ($elem.hasClass('draggable-list')) {
                         $elem.append($draggableStub);
-                    } else if (!$elem.hasClass('delete-area')){
+                    } else if (!$elem.hasClass('delete-area')) {
                         var childPos = $currentItem.offset();
                         var parentPos = $draggableStub.parent().offset();
 
@@ -54,7 +54,7 @@ $(document).ready(function () {
                                 }
                             }, 2000);
                             if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
-								$draggableStub.insertBefore($elem);
+                                $draggableStub.insertBefore($elem);
                             } else {
                                 $draggableStub.insertAfter($elem);
                             }
@@ -90,71 +90,71 @@ $(document).ready(function () {
                         }
                         $currentItem.trigger('OnDropped', [movingInfo, $draggableStub.parent().attr("name")]);
                         movingInfo.data.length = 0;
-                         $currentItem.children().insertAfter($draggableStub);
-                         _clearContainer();
+                        $currentItem.children().insertAfter($draggableStub);
+                        _clearContainer();
                     }
                 }
             }
             $draggableStub.detach();
         });
-		
-		function _makeDraggable(event) {
-			mousedown = true;
-                $currentItem = $(this);
-                var pos = $currentItem.offset();
-                elementOffset.x = event.pageX - pos.left;
-                elementOffset.y = event.pageY - pos.top;
 
-                if (!$currentItem.hasClass('draggable-item-selected') && !event.shiftKey) {
-                    movingInfo.data.push({ "name": $currentItem.parent().attr('name'), "item": $currentItem.html() });
-                }
+        function _makeDraggable(event) {
+            mousedown = true;
+            $currentItem = $(this);
+            var pos = $currentItem.offset();
+            elementOffset.x = event.pageX - pos.left;
+            elementOffset.y = event.pageY - pos.top;
 
-                if (event.ctrlKey) {
-                    if ($currentItem.hasClass('draggable-item-selected')) {
-                        $currentItem.toggleClass('draggable-item-selected', false);
-                        for (i = 0; i < movingInfo.data.length; i++) {
-                            if (movingInfo.data[i].name == $currentItem.parent().attr('name') && movingInfo.data[i].item == $currentItem.html()) {
-                                movingInfo.data.splice(i, 1);
-                            }
-                        }
-                    } else {
-                        $currentItem.toggleClass('draggable-item-selected', true);
-                    }
-                } else if (event.shiftKey) {
-                    var indexFirst = -1;
-                    var indexLast = -1;
-                    if ($('.draggable-item-selected').index() < $currentItem.index()) {
-                        indexFirst = $('.draggable-item-selected').index();
-                        indexLast = $currentItem.index();
-                    } else {
-                        indexFirst = $currentItem.index();
-                        indexLast = $('.draggable-item-selected').index();
-                    }
+            if (!$currentItem.hasClass('draggable-item-selected') && !event.shiftKey) {
+                movingInfo.data.push({ "name": $currentItem.parent().attr('name'), "item": $currentItem.html() });
+            }
 
-                    var currentChildren = $currentItem.parent().children();
-
-                    for (i = indexFirst; i <= indexLast; i++) {
-                        var $currentChild = $(currentChildren[i]);
-                        if (!$currentChild.hasClass('draggable-item-selected')) {
-                            $currentChild.toggleClass('draggable-item-selected', true);
-                            movingInfo.data.push({ "name": $currentChild.parent().attr('name'), "item": $currentChild.html() });
+            if (event.ctrlKey) {
+                if ($currentItem.hasClass('draggable-item-selected')) {
+                    $currentItem.toggleClass('draggable-item-selected', false);
+                    for (i = 0; i < movingInfo.data.length; i++) {
+                        if (movingInfo.data[i].name == $currentItem.parent().attr('name') && movingInfo.data[i].item == $currentItem.html()) {
+                            movingInfo.data.splice(i, 1);
                         }
                     }
                 } else {
-                    if (!$currentItem.parent().children().hasClass('draggable-item-selected') && $('.draggable-item-selected').length > 0) {
-                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
-                    } else if ($currentItem.parent().children().hasClass('draggable-item-selected') && $('.draggable-item-selected').length > 0 && !$currentItem.hasClass('draggable-item-selected')) {
-                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
-                    } else if ($currentItem.hasClass('draggable-item-selected') && $('.draggable-item-selected').length < 2) {
-                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
-                    } else if ($('.draggable-item-selected').length == 1) {
-                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
-                    }
                     $currentItem.toggleClass('draggable-item-selected', true);
                 }
-                parentId = $currentItem.parent().attr('id');
-		};
-		
+            } else if (event.shiftKey) {
+                var indexFirst = -1;
+                var indexLast = -1;
+                if ($('.draggable-item-selected').index() < $currentItem.index()) {
+                    indexFirst = $('.draggable-item-selected').index();
+                    indexLast = $currentItem.index();
+                } else {
+                    indexFirst = $currentItem.index();
+                    indexLast = $('.draggable-item-selected').index();
+                }
+
+                var currentChildren = $currentItem.parent().children();
+
+                for (i = indexFirst; i <= indexLast; i++) {
+                    var $currentChild = $(currentChildren[i]);
+                    if (!$currentChild.hasClass('draggable-item-selected')) {
+                        $currentChild.toggleClass('draggable-item-selected', true);
+                        movingInfo.data.push({ "name": $currentChild.parent().attr('name'), "item": $currentChild.html() });
+                    }
+                }
+            } else {
+                if (!$currentItem.parent().children().hasClass('draggable-item-selected') && $('.draggable-item-selected').length > 0) {
+                    $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+                } else if ($currentItem.parent().children().hasClass('draggable-item-selected') && $('.draggable-item-selected').length > 0 && !$currentItem.hasClass('draggable-item-selected')) {
+                    $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+                } else if ($currentItem.hasClass('draggable-item-selected') && $('.draggable-item-selected').length < 2) {
+                    $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+                } else if ($('.draggable-item-selected').length == 1) {
+                    $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+                }
+                $currentItem.toggleClass('draggable-item-selected', true);
+            }
+            parentId = $currentItem.parent().attr('id');
+        };
+
         function _setRelativePosition(event) {
             var parentOffet = $rootElement.offset();
             var relX = event.pageX - elementOffset.x - parentOffet.left;
@@ -173,9 +173,9 @@ $(document).ready(function () {
             }
             $currentItem.hide();
             var $elem = $(document.elementFromPoint(x, y));
-            if($elem.hasClass('delete-area'))
+            if ($elem.hasClass('delete-area'))
                 _onDeleteArea();
-            else if(deleteFlag == true){
+            else if (deleteFlag == true) {
                 _outDeleteArea();
             }
             $currentItem.show();
@@ -183,7 +183,7 @@ $(document).ready(function () {
                 return $elem;
             }
 
-            if($elem.hasClass('delete-area')){
+            if ($elem.hasClass('delete-area')) {
                 return $elem;
             }
 
@@ -193,32 +193,31 @@ $(document).ready(function () {
             return $elem.closest('.draggable-item:not(.dragging.draggable-stub)');
         }
 
-        function _setDeleteAreaCss(){
-            if (deleteFlag == true){
+        function _setDeleteAreaCss() {
+            if (deleteFlag == true) {
                 $('.delete-area').css({
-                        'border': 'solid red 3px'
+                    'border': 'solid red 3px'
                 })
-            }
-            else{
+            } else {
                 $('.delete-area').css({
                     'border': 'solid black 1px'
                 })
             }
         }
 
-        function _clearContainer (){
+        function _clearContainer() {
             $currentItem.removeAttr('style');
             $currentItem.toggleClass('dragging', false);
             $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
             $currentItem = null;
         }
 
-        function _onDeleteArea(){
+        function _onDeleteArea() {
             deleteFlag = true;
             _setDeleteAreaCss();
         }
 
-        function _outDeleteArea(){
+        function _outDeleteArea() {
             deleteFlag = false;
             _setDeleteAreaCss();
         }
@@ -228,33 +227,33 @@ $(document).ready(function () {
             if ((!mergeTo.hasClass('draggable-stub')) && (mergeToPos.top + 0.15 * $('.draggable-item').height() < pageY) && (mergeToPos.top + 0.85 * $('.draggable-item').height() > pageY)) {
                 if (mergeElem && mergeTo) {
                     if ($currentItem.hasClass('container') && $('.draggable-item-selected').length > 0) {
-						$currentItem.children().each(function(index, item) {
-							mergeTo.text(mergeTo.html() + ' ' + $(item).html());
-						});
+                        $currentItem.children().each(function(index, item) {
+                            mergeTo.text(mergeTo.html() + ' ' + $(item).html());
+                        });
                         $currentItem.children().detach();
                     } else {
                         mergeTo.text(mergeTo.html() + ' ' + mergeElem.html());
                         $currentItem.detach();
                     }
                     mergeTo.trigger('OnCombined', [mergeTo.text()]);
-                    _clearContainer();  
+                    _clearContainer();
                 }
             }
         })
 
-        $('.container').on('delete', function (e){
+        $('.container').on('delete', function(e) {
             $currentItem.empty();
             _clearContainer();
             deleteFlag = false;
             _setDeleteAreaCss();
         });
 
-        $('.draggable-list').on('shuffle', function (){
+        $('.draggable-list').on('shuffle', function() {
             var $this = $(this);
             var elems = $this.children('li');
-            elems.sort(function() { return (Math.round(Math.random())-0.5); });  
-            $this.remove(elems[0].tagName);  
-            $this.prepend(elems);     
+            elems.sort(function() { return (Math.round(Math.random()) - 0.5); });
+            $this.remove(elems[0].tagName);
+            $this.prepend(elems);
         })
 
         $('.draggable-list').on('add', function(e, data) {
@@ -262,7 +261,7 @@ $(document).ready(function () {
             $newItem.mousedown(_makeDraggable);
             $(this).prepend($newItem);
         });
-        
+
         $('.draggable-list').on('sort', function(e, dir) {
             $list = $(this);
             var sorted = $list.find("> .draggable-item").sort(function(a, b) {
@@ -273,22 +272,22 @@ $(document).ready(function () {
     };
 
     $('.draggable').makeDraggable();
-    $('.draggable').on('OnDropped', function (e, info, to) {
+    $('.draggable').on('OnDropped', function(e, info, to) {
         for (i = 0; i < info.data.length; i++) {
             console.log("Track " + info.data[i].item + " was moved from playlist with name: " + info.data[i].name + ", to playlist with name: " + to);
         }
     });
-    $('.draggable').on('OnCombined', function (e, combinedText) {
+    $('.draggable').on('OnCombined', function(e, combinedText) {
         console.log(combinedText);
     });
-	
-	$('.draggable-btn.add').click(function() {
-		$(this).parent().trigger('add', ['Some text']);
-	});
-	
-	$('.draggable-btn.sort').click(function() {
-		$(this).parent().trigger('sort', [-1]);
-	});
+
+    $('.draggable-btn.add').click(function() {
+        $(this).parent().trigger('add', ['Some text']);
+    });
+
+    $('.draggable-btn.sort').click(function() {
+        $(this).parent().trigger('sort', [-1]);
+    });
 
     $('.draggable-btn.shuffle').click(function() {
         $(this).parent().trigger('shuffle');
