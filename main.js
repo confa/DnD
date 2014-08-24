@@ -77,23 +77,11 @@ $(document).ready(function () {
         this.mousemove(function(event) {
             lastEvent = event;
             if ($currentItem && mousedown) {
-
-            	var $deleteArea = _getCurrentTarget(lastEvent);
-            	if($deleteArea.hasClass('delete-area')){
-            		console.log("in");
-                    _setDeleteAreaCss();
-                    deleteFlag = true;
-            	}
-                else{
-                    _setDeleteAreaCss()
-                    deleteFlag = false;
-                }
-
+                var $elem = _getCurrentTarget(event);
                 var listCount = $currentItem.parent().children().length
 
                 if ($currentItem.hasClass('draggable-item-selected')) {
                     $currentItem = $container;
-
                     $currentItem.append($('.draggable-item-selected'));
                 }
                 $currentItem.toggleClass('dragging', true);
@@ -101,9 +89,8 @@ $(document).ready(function () {
                 if (!$currentItem.hasClass('container')) {
                     $draggableStub.insertAfter($currentItem.children().last());
                 }
-                $currentItem.toggleClass('dragging', true);
+
                 _setRelativePosition(event);
-                var $elem = _getCurrentTarget(event);
                 if ($elem) {
                     if ($elem.hasClass('draggable-list')) {
                         $elem.append($draggableStub);
@@ -111,21 +98,19 @@ $(document).ready(function () {
                         var childPos = $currentItem.offset();
                         var parentPos = $draggableStub.parent().offset();
 
-                        if ($elem.length > 0 && mousedown) {
+                        if ($elem.length > 0) {
                             clearTimeout(timerId);
                             var $savedItem = $currentItem;
                             timerId = setTimeout(function() {
                                 var $hoverElement = _getCurrentTarget(lastEvent);
-                                if (mousedown && $elem.is($hoverElement)) {
+                                if ($elem.is($hoverElement)) {
                                     $elem.trigger('MergeItems', [$elem, $savedItem, event.pageY]);
                                 }
                             }, 2000);
-                            if (!$elem.hasClass('draggable-stub-empty')) {
-                                if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
-                                    $draggableStub.insertBefore($elem);
-                                } else {
-                                    $draggableStub.insertAfter($elem);
-                                }
+                            if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
+                                $draggableStub.insertBefore($elem);
+                            } else {
+                                $draggableStub.insertAfter($elem);
                             }
                         }
                     }
@@ -149,32 +134,18 @@ $(document).ready(function () {
                 } else {
 
                     if ($element.hasClass('delete-area')) {
-                        $currentItem.trigger("DeleteItem", [$currentItem]);
-
+                        $currentItem.trigger("DeleteItem");
                     }
 
-                    if ($element.hasClass('draggable-stub-empty')) {
-                        $element.replaceWith($draggableStub);
-                    }
-
-                    if ($currentItem.children().length > 0 && !$element.hasClass('delete-area')) {
+                    if ($currentItem != null && $currentItem.children().length > 0 && !$element.hasClass('delete-area')) {
                         var $items = "Items "
                         for (i = 0; i < $currentItem.children().length; i++) {
                             $items += $($currentItem.children()[i]).html() + " ";
                         }
                         $currentItem.trigger('OnDropped', [movingInfo, $draggableStub.parent().attr("name")]);
                         movingInfo.data.length = 0;
-                        $currentItem.removeAttr('style');
-                        $currentItem.children().insertAfter($draggableStub);
-                        $currentItem.toggleClass('dragging', false);
-                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
-                        $currentItem = null;
-                    } else if (!$currentItem.hasClass('draggable-item-selected') && $currentItem.hasClass('dragging')) {
-                        $currentItem.trigger('OnDropped', [movingInfo, $draggableStub.parent().attr("name")]);
-                        movingInfo.data.length = 0;
-                        $currentItem.insertAfter($draggableStub);
-                        $currentItem.toggleClass('dragging', false);
-                        $currentItem = null;
+                         $currentItem.children().insertAfter($draggableStub);
+                         _clearContainer();
                     }
                 }
             }
@@ -199,13 +170,18 @@ $(document).ready(function () {
             }
             $currentItem.hide();
             var $elem = $(document.elementFromPoint(x, y));
+            if($elem.hasClass('delete-area'))
+                _onDeleteArea();
+            else if(deleteFlag == true){
+                _outDeleteArea();
+            }
             $currentItem.show();
             if ($elem.hasClass('draggable-stub-empty')) {
                 return $elem;
             }
 
             if($elem.hasClass('delete-area')){
-            	return $elem;
+                return $elem;
             }
 
             if ($elem.closest('.draggable-list').find('li').length === 0) {
@@ -227,6 +203,39 @@ $(document).ready(function () {
             }
         }
 
+        function _clearContainer (){
+            $currentItem.removeAttr('style');
+            $currentItem.toggleClass('dragging', false);
+            $('.draggable-item-selected').toggleClass('draggable-item-selected', false);
+            $currentItem = null;
+        }
+
+        function _onDeleteArea(){
+            deleteFlag = true;
+            _setDeleteAreaCss();
+        }
+
+        function _outDeleteArea(){
+            deleteFlag = false;
+            _setDeleteAreaCss();
+        }
+
+        $('.container').on('DeleteItem', function (e){
+            $currentItem.empty();
+            _clearContainer();
+            deleteFlag = false;
+            _setDeleteAreaCss();
+        });
+
+        $('.draggable-list').on('ShuffleItems', function (){
+            var $this = $(this);
+            var elems = $this.children();
+            elems.sort(function() { return (Math.round(Math.random())-0.5); });  
+            $this.remove(elems[0].tagName);  
+            for(var i=0; i < elems.length; i++)
+                $this.append(elems[i]);     
+        })
+
         $('.draggable').on('MergeItems', function(e, mergeTo, mergeElem, pageY) {
             mergeToPos = mergeTo.offset();
             if ((!mergeTo.hasClass('draggable-stub')) && (mergeToPos.top + 0.15 * $('.draggable-item').height() < pageY) && (mergeToPos.top + 0.85 * $('.draggable-item').height() > pageY)) {
@@ -237,13 +246,11 @@ $(document).ready(function () {
                         $currentItem.removeAttr('style');
                         mergeTo.trigger('OnCombined', [mergeTo.text()]);
                         $currentItem.children().detach();
-                        $currentItem.toggleClass('dragging', false);
-                        $('.draggable-item-selected').toggleClass('draggable-item-selected', false)
                     } else {
                         mergeTo.text(mergeTo.html() + ' ' + mergeElem.html());
                         $currentItem.detach();
                     }
-                    $currentItem = null;
+                    _clearContainer();  
                 }
             }
         })
@@ -258,21 +265,4 @@ $(document).ready(function () {
     $('.draggable').on('OnCombined', function (e, combinedText) {
         console.log(combinedText);
     });
-
-    $('.container').on('DeleteItem', function (e, container){
-        container.empty();
-        $('.delete-area').css({
-                    'border': 'solid black 1px'
-                })
-        deleteFlag = false;
-    });
-
-    $('.draggable-list').on('ShuffleItems', function (){
-        var $this = $(this);
-        var elems = $this.children();
-        elems.sort(function() { return (Math.round(Math.random())-0.5); });  
-        $this.remove(elems[0].tagName);  
-        for(var i=0; i < elems.length; i++)
-            $this.append(elems[i]);     
-    })
 });
