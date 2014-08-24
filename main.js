@@ -51,9 +51,8 @@ $(document).ready(function () {
                                 var $hoverElement = _getCurrentTarget(lastEvent);
                                 if ($elem.is($hoverElement)) {
                                     $elem.trigger('MergeItems', [$elem, $savedItem, event.pageY]);
-									$('body').blur();
                                 }
-                            }, 500);
+                            }, 2000);
                             if (childPos && parentPos && childPos.top - parentPos.top < $($currentItem.children[0]).outerHeight() / 2) {
 								$draggableStub.insertBefore($elem);
                             } else {
