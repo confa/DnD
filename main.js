@@ -98,20 +98,6 @@ $(document).ready(function () {
             $draggableStub.detach();
         });
 		
-		$('.draggable-list').on('add', function(e, data) {
-			var $newItem = $('<li>').toggleClass('draggable-item', true).text(data);
-			$newItem.mousedown(_makeDraggable);
-			$(this).prepend($newItem);
-		});
-		
-		$('.draggable-list').on('sort', function(e, dir) {
-			$list = $(this);
-			var sorted = $list.find("> .draggable-item").sort(function(a, b) {
-				return $(a).text().toLowerCase() > $(b).text().toLowerCase() ? dir : -dir;
-			});
-			$list.prepend(sorted);
-		});
-		
 		function _makeDraggable(event) {
 			mousedown = true;
                 $currentItem = $(this);
@@ -304,3 +290,4 @@ $(document).ready(function () {
 	$('.draggable-btn.sort').click(function() {
 		$(this).parent().trigger('sort', [-1]);
 	});
+});
